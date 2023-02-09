@@ -1,16 +1,15 @@
 package com.example.myapplication.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.data.models.Cheque
+import com.example.myapplication.data.models.CreditCardModel
+import com.example.myapplication.data.models.UIState
 import com.example.myapplication.ui.elements.*
 import com.example.myapplication.ui.navigation.NavigationRoutes
 import com.example.myapplication.ui.theme.FormBackgroundColor
@@ -19,6 +18,7 @@ import com.example.myapplication.ui.viewmodels.MainScreenViewModel
 import com.example.myapplication.ui.viewmodels.TransactionsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -28,19 +28,37 @@ fun MainScreen(
     creditCardViewModel: CreditCardViewModel,
     mainScreenViewModel: MainScreenViewModel
 ) {
-    val creditCards =
-        creditCardViewModel.creditCards.collectAsState(initial = arrayListOf())
-    val chequeList = transactionViewModel.chequeList.collectAsState(initial = listOf())
-
     val pagerState = rememberPagerState()
     val cardsState = creditCardViewModel.uiState.collectAsState()
+    val transactionState = transactionViewModel.uiState.collectAsState()
 
-    //TODO Loading bar on cheque list
+    val creditCards =
+        produceState(initialValue = listOf<CreditCardModel>(), producer = {
+            creditCardViewModel.creditCards.collectLatest {
+                creditCardViewModel.uiState.value = UIState.Success
+                value = it
+            }
+        })
+    val currentCard =
+        produceState(initialValue = -1, pagerState.currentPage, creditCards.value) {
+            if (creditCards.value.isNotEmpty()) {
+                value = creditCards.value[pagerState.currentPage].id
+            }
+        }
+    val chequeList = produceState<List<Cheque>>(
+        initialValue = arrayListOf<Cheque>(),
+        currentCard.value,
+        producer = {
+            if (value.isEmpty() || currentCard.value != -1) {
+                transactionViewModel.getAllChequeByCard(currentCard.value)
+                    .collectLatest {
+                        value = it
+                    }
+            }
+        })
 
-    LaunchedEffect(key1 = pagerState.currentPage, block = {
-        transactionViewModel.getAllChequeByCard(pagerState.currentPage)
-        creditCardViewModel.getAllCreditCards()
-    })
+
+
 
     Column(
         modifier = Modifier
@@ -57,21 +75,27 @@ fun MainScreen(
         //body
         CreditCardList(
             creditCards = creditCards.value,
-            pagerState = pagerState, UIState = cardsState.value
-        ) { cardName, cardType, cardNumber, cardColor, cardId ->
-            creditCardViewModel.setDefaultValuesForCreditCard(
-                cardName,
-                cardType,
-                cardNumber,
-                cardColor,
-                cardId
-            )
-            mainScreenViewModel.currentDestination.value = NavigationRoutes.CreditCardFormUpdate
-        }
+            pagerState = pagerState, UIState = cardsState.value,
+            onCardEdit = { cardName, cardType, cardNumber, cardColor, cardId ->
+                creditCardViewModel.setDefaultValuesForCreditCard(
+                    cardName,
+                    cardType,
+                    cardNumber,
+                    cardColor,
+                    cardId
+                )
+                mainScreenViewModel.currentDestination.value = NavigationRoutes.CreditCardFormUpdate
+            },
+            onCardDelete = { id ->
+                creditCardViewModel.deleteById(id)
+                transactionViewModel.uiState.value = UIState.Loading
+            }
+        )
 
         TransactionList(
             cheques = chequeList.value.reversed(),
             isCardListEmpty = creditCards.value.isEmpty(),
+            uiState = transactionState.value,
             onAddTransaction = {
                 mainScreenViewModel.currentDestination.value = NavigationRoutes.TransactionForm
             },
@@ -92,14 +116,14 @@ fun MainScreen(
                     navController.navigate(NavigationRoutes.CreditCardForm.route)
                 }
                 is NavigationRoutes.TransactionForm -> {
-                    navController.navigate(NavigationRoutes.TransactionForm.route + "/${pagerState.currentPage}")
+                    navController.navigate(NavigationRoutes.TransactionForm.route + "/${currentCard.value}")
                 }
                 is NavigationRoutes.TransactionFormUpdate -> {
-                    navController.navigate(NavigationRoutes.TransactionFormUpdate.route + "/${pagerState.currentPage}/${transactionViewModel.chequeID.value}")
+                    navController.navigate(NavigationRoutes.TransactionFormUpdate.route + "/${currentCard.value}/${transactionViewModel.chequeID.value}")
                 }
                 is NavigationRoutes.CreditCardFormUpdate -> {
                     navController.navigate(
-                        NavigationRoutes.CreditCardFormUpdate.route + "/${pagerState.currentPage}"
+                        NavigationRoutes.CreditCardFormUpdate.route + "/${currentCard.value}"
                     )
                 }
                 is NavigationRoutes.MainScreen -> {

@@ -5,7 +5,6 @@ import com.example.myapplication.data.models.CreditCardModel
 import com.example.myapplication.data.models.TransactionModel
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
-import java.util.*
 
 interface Repository {
     fun getAllCreditCards(): Flow<List<CreditCardModel>>
@@ -24,6 +23,7 @@ interface Repository {
     )
 
     suspend fun deleteCardById(id: Int)
+    suspend fun deleteChequeByCardID(cardId: Int)
 
 
     suspend fun createCheque(

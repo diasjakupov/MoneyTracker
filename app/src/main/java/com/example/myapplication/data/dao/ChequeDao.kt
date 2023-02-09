@@ -24,4 +24,8 @@ interface ChequeDao {
 
     @Query("DELETE FROM cheque WHERE id=:idx")
     suspend fun deleteById(idx:Int)
+
+
+    @Query("DELETE FROM cheque WHERE cardId=:cardId")
+    suspend fun deleteByCardId(cardId: Int)
 }

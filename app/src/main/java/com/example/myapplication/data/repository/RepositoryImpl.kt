@@ -1,6 +1,5 @@
 package com.example.myapplication.data.repository
 
-import android.util.Log
 import com.example.myapplication.data.dao.ChequeDao
 import com.example.myapplication.data.dao.CreditCardDao
 import com.example.myapplication.data.models.Cheque
@@ -8,7 +7,6 @@ import com.example.myapplication.data.models.CreditCardModel
 import com.example.myapplication.data.models.TransactionModel
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
-import java.util.*
 import javax.inject.Inject
 
 
@@ -55,13 +53,17 @@ class RepositoryImpl @Inject constructor(
                 cardNumber,
                 0,
                 color.toString(),
-                cardId + 1
+                cardId
             )
         )
     }
 
     override suspend fun deleteCardById(id: Int) {
         creditCardDao.deleteCreditCard(id)
+    }
+
+    override suspend fun deleteChequeByCardID(cardId: Int) {
+        chequeDao.deleteByCardId(cardId)
     }
 
 

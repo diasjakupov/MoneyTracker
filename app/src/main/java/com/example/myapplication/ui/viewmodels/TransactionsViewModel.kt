@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
@@ -7,11 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.models.Cheque
 import com.example.myapplication.data.models.FilterOptions
 import com.example.myapplication.data.models.TransactionModel
+import com.example.myapplication.data.models.UIState
 import com.example.myapplication.data.repository.RepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+
 import javax.inject.Inject
 
 
@@ -24,6 +29,7 @@ class TransactionsViewModel @Inject constructor(
     val transactionPrices = hashMapOf<Int, String>()
     val chequeDate = mutableStateOf(LocalDate.now())
     val chequeID = mutableStateOf(-1)
+    val uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Loading)
 
 
     fun filterChequeList(filterOptions: FilterOptions) {
@@ -41,12 +47,22 @@ class TransactionsViewModel @Inject constructor(
 
     fun getAllChequeByCard(
         id: Int
-    ) {
-        viewModelScope.launch {
-            repositoryImpl.getAllCheques(id + 1).collect {
-                chequeList.value = it
-            }
-        }
+    ): Flow<List<Cheque>> {
+
+        Log.e("TAG", "PAGE: ${id}")
+        uiState.value = UIState.Success
+        return repositoryImpl.getAllCheques(id)
+//            repositoryImpl.getAllCheques(id).collectLatest {
+//                uiState.value = UIState.Loading
+//                Log.e("TAG", "Start collecting")
+//
+//                Log.e("TAG", "Transaction list ${it}")
+//                delay(2000L)
+//                uiState.value = UIState.Success
+//                chequeList.value = it
+//
+//            }
+
     }
 
     fun createOrUpdateCheque(
@@ -72,13 +88,13 @@ class TransactionsViewModel @Inject constructor(
                 )
 
             }
-            if(chequeId == -1){
+            if (chequeId == -1) {
                 repositoryImpl.createCheque(
-                    cardId + 1, transaction, date
+                    cardId, transaction, date
                 )
-            }else{
+            } else {
                 repositoryImpl.updateCheque(
-                    cardId + 1, transaction, date, chequeId
+                    cardId, transaction, date, chequeId
                 )
             }
 
@@ -88,21 +104,22 @@ class TransactionsViewModel @Inject constructor(
     fun setDefaultChequeInfo(
         trans: List<TransactionModel>, date: LocalDate, id: Int
     ) {
-        trans.forEachIndexed { idx, model->
-            transactionNames[idx+1] = model.name
-            transactionPrices[idx+1] = model.price.toString()
+        trans.forEachIndexed { idx, model ->
+            transactionNames[idx + 1] = model.name
+            transactionPrices[idx + 1] = model.price.toString()
         }
         chequeDate.value = date
         chequeID.value = id
     }
 
-    fun clearTransactionsInfo(){
+    fun clearTransactionsInfo() {
         transactionNames.clear()
         transactionPrices.clear()
         chequeID.value = -1
         chequeDate.value = LocalDate.now()
     }
-    fun deleteById(idx:Int){
+
+    fun deleteById(idx: Int) {
         viewModelScope.launch {
             repositoryImpl.deleteChequeById(idx)
         }

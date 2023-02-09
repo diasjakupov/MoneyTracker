@@ -45,7 +45,7 @@ fun NavigationView(navController: NavHostController) {
             }
             val creditCardViewModel = hiltViewModel<CreditCardViewModel>(parentEntry)
             CreditCardForm(onGoBack = {
-                navController.popBackStack()
+                navController.navigateUp()
                 mainScreenViewModel.currentDestination.value = NavigationRoutes.MainScreen
             }, onSave = { cardName: String, type: String, cardNumber: String, color: ULong ->
                 creditCardViewModel.createOrUpdateCard(
@@ -72,7 +72,7 @@ fun NavigationView(navController: NavHostController) {
                 _cardNumber = creditCardViewModel.creditCardInfo.value.cardNumber,
                 _cardType = CreditCardTypes.getClass(creditCardViewModel.creditCardInfo.value.type),
                 onGoBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                     mainScreenViewModel.currentDestination.value = NavigationRoutes.MainScreen
                 },
                 onSave = { cardName: String, type: String, cardNumber: String, color: ULong ->
@@ -99,7 +99,7 @@ fun NavigationView(navController: NavHostController) {
             val transactionsViewModel = hiltViewModel<TransactionsViewModel>(parentEntry)
             TransactionForm(
                 onGoBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                     mainScreenViewModel.currentDestination.value = NavigationRoutes.MainScreen
                 },
             ) { names, date, prices ->
@@ -121,7 +121,7 @@ fun NavigationView(navController: NavHostController) {
                 _transactionPrices = transactionsViewModel.transactionPrices,
                 _transactionDate = transactionsViewModel.chequeDate.value,
                 onGoBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                     transactionsViewModel.clearTransactionsInfo()
                     mainScreenViewModel.currentDestination.value = NavigationRoutes.MainScreen
                 },

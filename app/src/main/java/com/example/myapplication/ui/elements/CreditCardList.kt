@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.elements
 
-import android.provider.Contacts.Intents.UI
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -20,7 +19,8 @@ fun CreditCardList(
     creditCards: List<CreditCardModel>,
     UIState: UIState,
     pagerState: PagerState,
-    onCreditCardClick: (cardName: String, cardType: CreditCardTypes, cardNumber: String, cardColor: Color, cardId: Int) -> Unit
+    onCardDelete: (id: Int)->Unit,
+    onCardEdit: (cardName: String, cardType: CreditCardTypes, cardNumber: String, cardColor: Color, cardId: Int) -> Unit
 ) {
     when(UIState){
         is UIState.Loading->{
@@ -42,10 +42,14 @@ fun CreditCardList(
                             cardNumber = creditCards[idx].cardNumber,
                             cardType = CreditCardTypes.getClass(creditCards[idx].type),
                             cardColor = Color(creditCards[idx].color.toULong()),
-                            cardId = creditCards[idx].id
-                        ) { cardName, cardType, cardNumber, cardColor, cardId ->
-                            onCreditCardClick(cardName, cardType, cardNumber, cardColor, cardId)
-                        }
+                            cardId = creditCards[idx].id,
+                            onCardEdit = { cardName, cardType, cardNumber, cardColor, cardId ->
+                                onCardEdit(cardName, cardType, cardNumber, cardColor, cardId)
+                            },
+                            onDeleteById = {id->
+                                onCardDelete(id)
+                            }
+                        )
                     }
                 } else {
                     Box(
