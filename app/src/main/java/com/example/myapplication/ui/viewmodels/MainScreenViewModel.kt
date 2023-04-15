@@ -8,8 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(): ViewModel() {
-    //TODO (UISTATE)
+class MainScreenViewModel @Inject constructor() : ViewModel() {
     val currentDestination: MutableState<NavigationRoutes> =
         mutableStateOf(NavigationRoutes.MainScreen)
 }

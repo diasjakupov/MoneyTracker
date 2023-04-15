@@ -13,7 +13,7 @@ import com.example.myapplication.data.transformers.TransactionConverter
 
 @Database(
     entities = [CreditCardModel::class, TransactionModel::class, Cheque::class],
-    version = 1
+    version = 2
 )
 @TypeConverters(DateConverter::class, TransactionConverter::class)
 abstract class MyDatabase : RoomDatabase() {

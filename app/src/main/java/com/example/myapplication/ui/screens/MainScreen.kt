@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -46,19 +47,15 @@ fun MainScreen(
             }
         }
     val chequeList = produceState<List<Cheque>>(
-        initialValue = arrayListOf<Cheque>(),
+        initialValue = arrayListOf(),
         currentCard.value,
+        transactionViewModel.isFiltered.value,
         producer = {
-            if (value.isEmpty() || currentCard.value != -1) {
-                transactionViewModel.getAllChequeByCard(currentCard.value)
-                    .collectLatest {
-                        value = it
-                    }
+            Log.e("TAG", "update ${transactionViewModel.isFiltered.value}")
+            transactionViewModel.getAllChequeByCard(currentCard.value) {
+                value = it
             }
         })
-
-
-
 
     Column(
         modifier = Modifier
@@ -100,7 +97,7 @@ fun MainScreen(
                 mainScreenViewModel.currentDestination.value = NavigationRoutes.TransactionForm
             },
             onFilter = { filterOptions ->
-                transactionViewModel.filterChequeList(filterOptions)
+                transactionViewModel.isFiltered.value = filterOptions
             },
             onTransactionEdit = { transactions, date, idx ->
                 transactionViewModel.setDefaultChequeInfo(transactions, date, idx)
@@ -111,6 +108,7 @@ fun MainScreen(
             })
 
         LaunchedEffect(key1 = mainScreenViewModel.currentDestination.value, block = {
+            println(mainScreenViewModel.currentDestination)
             when (mainScreenViewModel.currentDestination.value) {
                 is NavigationRoutes.CreditCardForm -> {
                     navController.navigate(NavigationRoutes.CreditCardForm.route)
@@ -126,9 +124,13 @@ fun MainScreen(
                         NavigationRoutes.CreditCardFormUpdate.route + "/${currentCard.value}"
                     )
                 }
+                is NavigationRoutes.QRScanner -> {
+
+                }
                 is NavigationRoutes.MainScreen -> {
                     creditCardViewModel.creditCardClear()
                 }
+
                 else -> {}
             }
         })

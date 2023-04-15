@@ -19,17 +19,22 @@ fun CreditCardList(
     creditCards: List<CreditCardModel>,
     UIState: UIState,
     pagerState: PagerState,
-    onCardDelete: (id: Int)->Unit,
+    onCardDelete: (id: Int) -> Unit,
     onCardEdit: (cardName: String, cardType: CreditCardTypes, cardNumber: String, cardColor: Color, cardId: Int) -> Unit
 ) {
-    when(UIState){
-        is UIState.Loading->{
-            Box(modifier = Modifier.fillMaxWidth().height(250.dp), contentAlignment = Alignment.Center){
+    when (UIState) {
+        is UIState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
 
             }
         }
-        is UIState.Success->{
+        is UIState.Success -> {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (creditCards.isNotEmpty()) {
                     HorizontalPager(
@@ -41,12 +46,12 @@ fun CreditCardList(
                             cardName = creditCards[idx].name,
                             cardNumber = creditCards[idx].cardNumber,
                             cardType = CreditCardTypes.getClass(creditCards[idx].type),
-                            cardColor = Color(creditCards[idx].color.toULong()),
+                            cardColor = Color(creditCards[idx].color),
                             cardId = creditCards[idx].id,
                             onCardEdit = { cardName, cardType, cardNumber, cardColor, cardId ->
                                 onCardEdit(cardName, cardType, cardNumber, cardColor, cardId)
                             },
-                            onDeleteById = {id->
+                            onDeleteById = { id ->
                                 onCardDelete(id)
                             }
                         )
@@ -68,7 +73,7 @@ fun CreditCardList(
                 )
             }
         }
-        is UIState.Error->{
+        is UIState.Error -> {
 
         }
     }

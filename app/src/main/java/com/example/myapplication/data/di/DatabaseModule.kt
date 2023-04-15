@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.myapplication.data.dao.ChequeDao
 import com.example.myapplication.data.dao.CreditCardDao
+import com.example.myapplication.data.datasource.RemoteDataSource
 import com.example.myapplication.data.db.MyDatabase
 import com.example.myapplication.data.repository.Repository
 import com.example.myapplication.data.repository.RepositoryImpl
@@ -35,13 +36,15 @@ class DatabaseModule {
     }
 
 
+
     @Provides
     @Singleton
     fun providesRepository(
         creditDao: CreditCardDao,
-        chequeDao: ChequeDao
+        chequeDao: ChequeDao,
+        remoteDataSource: RemoteDataSource
     ): RepositoryImpl {
-        return RepositoryImpl(creditDao, chequeDao)
+        return RepositoryImpl(creditDao, chequeDao, remoteDataSource)
     }
 
 

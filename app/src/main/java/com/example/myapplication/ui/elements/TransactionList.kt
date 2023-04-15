@@ -28,8 +28,8 @@ fun TransactionList(
     uiState: UIState,
     onAddTransaction: () -> Unit,
     onFilter: (filterOptions: FilterOptions) -> Unit,
-    onTransactionEdit: (transactions: List<TransactionModel>, date: LocalDate, id:Int)->Unit,
-    onDelete: (id:Int)->Unit
+    onTransactionEdit: (transactions: List<TransactionModel>, date: LocalDate, id: Int) -> Unit,
+    onDelete: (id: Int) -> Unit
 ) {
     val isFilterShown = remember() {
         mutableStateOf(false)
@@ -72,8 +72,8 @@ fun TransactionList(
             }
 
         }
-        when(uiState){
-            is UIState.Success->{
+        when (uiState) {
+            is UIState.Success -> {
                 if (cheques.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyColumn(
@@ -81,10 +81,17 @@ fun TransactionList(
                     ) {
                         items(cheques.size) { idx ->
                             TransactionView(
-                                transactions = cheques[idx].transactions, date = cheques[idx].date, total = cheques[idx].total,
+                                transactions = cheques[idx].transactions,
+                                date = cheques[idx].date,
+                                total = cheques[idx].total,
                                 onTransactionEdit = {
-                                    onTransactionEdit(cheques[idx].transactions, cheques[idx].date, cheques[idx].id)
-                                }, onDeleteById = {
+                                    onTransactionEdit(
+                                        cheques[idx].transactions,
+                                        cheques[idx].date,
+                                        cheques[idx].id
+                                    )
+                                },
+                                onDeleteById = {
                                     onDelete(cheques[idx].id)
                                 }
                             )
@@ -102,12 +109,12 @@ fun TransactionList(
 
                 }
             }
-            is UIState.Loading->{
+            is UIState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
-            is UIState.Error->{
+            is UIState.Error -> {
 
             }
         }

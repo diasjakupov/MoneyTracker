@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.ui.navigation.NavigationRoutes
 
 @Composable
-fun Header(onClick: ()->Unit) {
+fun Header(onClick: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

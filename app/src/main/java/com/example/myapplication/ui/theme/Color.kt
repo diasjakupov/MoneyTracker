@@ -9,7 +9,8 @@ val Purple700 = Color(0xFF3700B3)
 val Colors.Teal: Color get() = Color(0xFF03DAC5)
 val Colors.FormBackgroundColor: Color
     get() = Color(244, 244, 244)
-
+val Colors.LightBackgroundColor: Color
+    get() = Color(237, 237, 237)
 val Colors.Link: Color
     get() = Color(51,102,187)
 

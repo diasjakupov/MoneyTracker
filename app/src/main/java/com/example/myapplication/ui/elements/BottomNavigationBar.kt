@@ -3,6 +3,7 @@ package com.example.myapplication.ui.elements
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.ui.navigation.GRAPH_ROUTE
+import com.example.myapplication.ui.navigation.MAIN_SCREEN_ROUTE
 import com.example.myapplication.ui.navigation.NavigationRoutes
 import com.example.myapplication.ui.theme.ApplyColor
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -40,7 +43,9 @@ fun BottomNavigationBar(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth(0.5f)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,  modifier = Modifier.clickable {
+                    navController.navigate(MAIN_SCREEN_ROUTE)
+                }) {
                     CreditCardIcon(
                         iconColor = if (currentBackStackEntry.value?.destination?.route
                             != NavigationRoutes.MainScreen.route) {
@@ -57,7 +62,9 @@ fun BottomNavigationBar(navController: NavController) {
             }
             Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxWidth()) {
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
+                    navController.navigate(GRAPH_ROUTE)
+                }) {
                     HistogramIcon(
                         iconColor = if (currentBackStackEntry.value?.destination?.route
                             != NavigationRoutes.GraphsScreen.route) {

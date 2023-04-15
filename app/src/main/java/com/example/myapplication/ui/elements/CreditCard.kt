@@ -34,9 +34,9 @@ fun CreditCardView(
     cardColor: Color = Color.Blue,
     cardId: Int,
     onCardEdit: (
-        cardName: String, cardType: CreditCardTypes, cardNumber: String, cardColor: Color, cardId:Int
+        cardName: String, cardType: CreditCardTypes, cardNumber: String, cardColor: Color, cardId: Int
     ) -> Unit,
-    onDeleteById: (id: Int)->Unit
+    onDeleteById: (id: Int) -> Unit
 ) {
     val cardOptions = remember {
         mutableStateOf(false)
@@ -55,111 +55,102 @@ fun CreditCardView(
     ) {
 
 
-            Column(
-                modifier = Modifier
-                    .padding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 30.dp)
-                    .fillMaxWidth()
-                    .onSizeChanged {
-                        sizeOfView.value = it
-                    }
-            ) {
-
-                Box(){
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(cardName, style = typography.h5)
-                        IconButton(onClick = {
-                            cardOptions.value = true
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreHoriz,
-                                contentDescription = "three dots", modifier = Modifier.size(34.dp)
-                            )
-                        }
-                    }
-                    DropdownMenu(
-                        offset = DpOffset(
-                            x = (sizeOfView.value.width.div(density.density) - 100).dp,
-                            y = (-50).dp
-                        ),
-                        expanded = cardOptions.value,
-                        onDismissRequest = { cardOptions.value = false }
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .width(100.dp)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .clickable {
-                                    onCardEdit(cardName, cardType, cardNumber, cardColor, cardId)
-                                    cardOptions.value = false
-                                }
-                        ) {
-                            Text("Edit")
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                        }
-                        Divider()
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .width(100.dp)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .clickable {
-                                    onDeleteById(cardId)
-                                    cardOptions.value = false
-                                }
-                        ) {
-                            Text("Delete")
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                        }
-                    }
+        Column(
+            modifier = Modifier
+                .padding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 30.dp)
+                .fillMaxWidth()
+                .onSizeChanged {
+                    sizeOfView.value = it
                 }
+        ) {
 
-
+            Box() {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        painter = when (cardType) {
-                            is CreditCardTypes.MasterCard -> {
-                                painterResource(id = R.drawable.mastercard)
-                            }
-                            is CreditCardTypes.Visa -> {
-                                painterResource(id = R.drawable.visa)
-                            }
-
-                        },
-                        contentDescription = "card type image", contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(width = 100.dp, height = 50.dp)
-                    )
-                    Text(text = "Balance: $5,000", style = typography.h6)
+                    Text(cardName, style = typography.h5)
+                    IconButton(onClick = {
+                        cardOptions.value = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreHoriz,
+                            contentDescription = "three dots", modifier = Modifier.size(34.dp)
+                        )
+                    }
                 }
-
-                Text(
-                    cardNumber,
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp)
+                DropdownMenu(
+                    offset = DpOffset(
+                        x = (sizeOfView.value.width.div(density.density) - 100).dp,
+                        y = (-50).dp
+                    ),
+                    expanded = cardOptions.value,
+                    onDismissRequest = { cardOptions.value = false }
                 ) {
-                    Text("Credit limit: $500")
-                    Text("Valid till: 12/09/20")
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .width(100.dp)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .clickable {
+                                onCardEdit(cardName, cardType, cardNumber, cardColor, cardId)
+                                cardOptions.value = false
+                            }
+                    ) {
+                        Text("Edit")
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                    }
+                    Divider()
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .width(100.dp)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .clickable {
+                                onDeleteById(cardId)
+                                cardOptions.value = false
+                            }
+                    ) {
+                        Text("Delete")
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                    }
                 }
             }
+
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .fillMaxWidth()
+            ) {
+                Image(
+                    painter = when (cardType) {
+                        is CreditCardTypes.MasterCard -> {
+                            painterResource(id = R.drawable.mastercard)
+                        }
+                        is CreditCardTypes.Visa -> {
+                            painterResource(id = R.drawable.visa)
+                        }
+
+                    },
+                    contentDescription = "card type image", contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(width = 100.dp, height = 50.dp)
+                )
+                
+            }
+
+            Text(
+                cardNumber,
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
 
         }
 
     }
+
+}
 
 

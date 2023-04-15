@@ -2,7 +2,9 @@ package com.example.myapplication.data.repository
 
 import com.example.myapplication.data.models.Cheque
 import com.example.myapplication.data.models.CreditCardModel
+import com.example.myapplication.data.models.RemoteCheque
 import com.example.myapplication.data.models.TransactionModel
+import com.example.myapplication.data.network.NetResponse
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -12,14 +14,14 @@ interface Repository {
         cardName: String,
         type: String,
         cardNumber: String,
-        color: ULong
+        color: Int
     )
 
     suspend fun updateCard(
         cardName: String,
         type: String,
         cardNumber: String,
-        color: ULong, cardId: Int
+        color: Int, cardId: Int
     )
 
     suspend fun deleteCardById(id: Int)
@@ -40,4 +42,6 @@ interface Repository {
 
     fun getAllCheques(cardId: Int): Flow<List<Cheque>>
     suspend fun deleteChequeById(idx: Int)
+
+    suspend fun getRemoteCheque(url: String): Flow<NetResponse<RemoteCheque?>>
 }

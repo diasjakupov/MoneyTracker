@@ -1,8 +1,10 @@
 package com.example.myapplication.ui.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.models.*
@@ -23,7 +25,7 @@ class CreditCardViewModel @Inject constructor(
 
     val creditCardInfo: MutableState<CreditCardModel> = mutableStateOf(
         CreditCardModel(
-            "", "", "", 0, Color.Red.value.toString()
+            "", "", "", 0, Color.Red.toArgb()
         )
     )
     private val _creditCards = repositoryImpl.getAllCreditCards().map {
@@ -44,7 +46,7 @@ class CreditCardViewModel @Inject constructor(
 
 
     fun creditCardClear() {
-        creditCardInfo.value = CreditCardModel("", "", "", 0, Color.Red.value.toString())
+        creditCardInfo.value = CreditCardModel("", "", "", 0, Color.Red.toArgb())
     }
 
     fun setDefaultValuesForCreditCard(
@@ -54,13 +56,14 @@ class CreditCardViewModel @Inject constructor(
         cardColor: Color,
         cardId: Int
     ) {
+        Log.e("HAH", cardColor.toArgb().toString())
         creditCardInfo.value =
             CreditCardModel(
                 cardName,
                 cardType.name,
                 cardNumber.replace(" ", ""),
                 0,
-                cardColor.value.toString(), cardId
+                cardColor.toArgb(), cardId
             )
     }
 
@@ -69,8 +72,9 @@ class CreditCardViewModel @Inject constructor(
         cardName: String,
         type: String,
         cardNumber: String,
-        color: ULong, cardId: Int
+        color: Int, cardId: Int
     ) {
+        Log.e("TAG", color.toString())
         viewModelScope.launch(Dispatchers.IO) {
             if (cardId == -1) {
                 repositoryImpl.createCard(cardName, type, cardNumber, color)

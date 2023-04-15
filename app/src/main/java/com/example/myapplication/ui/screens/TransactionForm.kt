@@ -15,11 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.*
+import com.example.myapplication.ui.viewmodels.TransactionsViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -30,42 +32,34 @@ import kotlin.collections.HashMap
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TransactionForm(
-    _transactionNames: HashMap<Int, String> = hashMapOf(),
-    _transactionPrices: HashMap<Int, String> = hashMapOf(),
-    _transactionDate: LocalDate = LocalDate.now(),
-
+    viewModel: TransactionsViewModel,
+    cardId: Int,
+    chequeId: Int,
     onGoBack: () -> Unit,
-    onSave: (names: Map<Int, String>, date: LocalDate, price: SnapshotStateMap<Int, String>) -> Unit
+    onQRScan: ()->Unit
 ) {
     val transactionName = remember {
-        val store = mutableStateMapOf<Int, String>()
-        for ((key, value) in _transactionNames) {
-            store[key] = value
-        }
-        Log.e("TAG INSIDE", "${store.size}")
-        if (store.size == 0) {
-            store[1] = ""
-        }
-        store
+        viewModel.transactionNames
     }
     val transactionPrice = remember {
-        val store = mutableStateMapOf<Int, String>()
-        for ((key, value) in _transactionPrices) {
-            store[key] = value
-        }
-        if (store.size == 0) {
-            store[1] = "0.0"
-        }
-        store
+        viewModel.transactionPrices
     }
     val transactionDate = remember {
-        mutableStateOf(_transactionDate)
+        mutableStateOf(viewModel.chequeDate)
     }
-
 
     //Date Picker Dialog
     val dialogState = rememberMaterialDialogState()
 
+//    DisposableEffect(key1 = true, effect = {
+//        onDispose {
+//            onGoBack()
+//        }
+//    })
+
+    LaunchedEffect(key1 = true, block = {
+        viewModel.parseDataToTransaction()
+    })
 
     MaterialDialog(dialogState = dialogState, buttons = {
         positiveButton("Ok")
@@ -266,6 +260,24 @@ fun TransactionForm(
 
             }
 
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterStart,
+            ){
+                IconButton(onClick = {
+                    println("PRINT")
+                    onQRScan()
+                },
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        ) {
+                    Icon(imageVector = Icons.Default.QrCodeScanner,
+                        contentDescription = "qr code scanner",
+                        modifier = Modifier.size(40.dp))
+                }
+            }
 
 
             Box(
@@ -275,13 +287,16 @@ fun TransactionForm(
                 Spacer(modifier = Modifier.fillMaxHeight())
                 Button(
                     onClick = {
-                        onSave(
-                            transactionName.filter {
+                        viewModel.createOrUpdateCheque(
+                            names = transactionName.filter {
                                 it.value != ""
                             },
-                            transactionDate.value,
-                            transactionPrice
+                            date = transactionDate.value,
+                            price = transactionPrice,
+                            cardId = cardId,
+                            chequeId = chequeId
                         )
+
                         onGoBack()
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -294,6 +309,9 @@ fun TransactionForm(
                     Text("Save".uppercase(), fontSize = 20.sp)
                 }
             }
+
+
+
         }
     }
 }

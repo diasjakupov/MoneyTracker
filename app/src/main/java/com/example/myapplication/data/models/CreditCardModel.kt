@@ -10,7 +10,7 @@ data class CreditCardModel(
     var type: String,
     var cardNumber: String,
     var balance: Int,
-    var color: String,
+    var color: Int,
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 ){
 

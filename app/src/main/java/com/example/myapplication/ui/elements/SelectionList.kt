@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.models.Type
 
 @Composable
-fun SelectionList(textValue: String,
-                  listOfValues: List<Type>,
-                  modifier: Modifier,
-                  onValueChange: (text: Type) -> Unit) {
+fun SelectionList(
+    textValue: String,
+    listOfValues: List<Type>,
+    modifier: Modifier,
+    onValueChange: (text: Type) -> Unit
+) {
     LazyColumn(
         modifier = modifier
             .shadow(10.dp, shape = RoundedCornerShape(12.dp))

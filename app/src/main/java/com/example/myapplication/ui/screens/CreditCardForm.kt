@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,34 +29,31 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.data.models.CreditCardModel
 import com.example.myapplication.data.models.CreditCardTypes
 import com.example.myapplication.ui.elements.BottomSheetColorPicker
 import com.example.myapplication.ui.elements.VerticalPicker
 import com.example.myapplication.ui.theme.*
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.viewmodels.CreditCardViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CreditCardForm(
-    _cardName: String = "",
-    _cardType: CreditCardTypes = CreditCardTypes.MasterCard,
-    _cardNumber: String = "",
-    _cardColor: Color = Color.Red,
+    viewModel: CreditCardViewModel,
+    cardId: Int,
     onGoBack: () -> Unit,
-    onSave: (cardName: String,
-             type: String,
-             cardNumber: String,
-             color: ULong)->Unit
 ) {
     val cardName: MutableState<String> = remember {
-        mutableStateOf(_cardName)
+        mutableStateOf(viewModel.creditCardInfo.value.name)
     }
     val cardType: MutableState<CreditCardTypes> = remember {
-        mutableStateOf(_cardType)
+
+        mutableStateOf(CreditCardTypes.getClass(viewModel.creditCardInfo.value.type))
     }
     val cardNumber: MutableState<String> = remember {
-        mutableStateOf(_cardNumber)
+        mutableStateOf(viewModel.creditCardInfo.value.cardNumber)
     }
 
     val creditTypes = remember {
@@ -62,7 +61,7 @@ fun CreditCardForm(
     }
 
     val pickedColor = remember {
-        mutableStateOf(_cardColor)
+        mutableStateOf(Color(viewModel.creditCardInfo.value.color))
     }
 
     val bottomSheetScaffoldState = rememberModalBottomSheetState(
@@ -285,10 +284,13 @@ fun CreditCardForm(
                     Spacer(modifier = Modifier.fillMaxHeight())
                     Button(
                         onClick = {
-                            onSave(cardName.value,
-                                cardType.value.name,
-                                cardNumber.value,
-                                pickedColor.value.value)
+                            viewModel.createOrUpdateCard(
+                                cardName = cardName.value,
+                                type = cardType.value.name,
+                                cardNumber = cardNumber.value,
+                                color = pickedColor.value.toArgb(),
+                                cardId = cardId,
+                            )
                             onGoBack()
                         },
                         modifier = Modifier.fillMaxWidth(),
